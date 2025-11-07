@@ -10,6 +10,7 @@ project(libfranka
 )
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_PREFIX_PATH "/opt/openrobots/lib/cmake")  # Find Pinocchio cmake file
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,6 +27,7 @@ set(THIRDPARTY_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty" CACHE PATH
 
 ## Dependencies
 find_package(Poco REQUIRED COMPONENTS Net Foundation)
+find_package(console_bridge REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(pinocchio REQUIRED)
 

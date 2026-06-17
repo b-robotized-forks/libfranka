@@ -50,6 +50,11 @@ Model::Model(Network& network, std::unique_ptr<RobotModelBase> robot_model)
   robot_model_ = std::move(robot_model);
 }
 
+Model::Model(Network& network, const std::string& urdf_model)
+    : library_{new ModelLibrary(network)} {
+  robot_model_ = std::make_unique<RobotModel>(urdf_model);
+}
+
 // Has to be declared here, as the ModelLibrary type is incomplete in the header
 Model::~Model() noexcept = default;
 Model::Model(Model&&) noexcept = default;

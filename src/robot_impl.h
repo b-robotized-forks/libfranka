@@ -88,6 +88,8 @@ class Robot::Impl : public RobotControl {
 
   Model loadModel() const;
 
+  Model loadModel(const std::string& urdf_model) const;
+
   // for the unit tests
   Model loadModel(std::unique_ptr<RobotModelBase> robot_model) const;
 

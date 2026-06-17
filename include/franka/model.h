@@ -75,6 +75,7 @@ class Model {
    *
    */
   explicit Model(franka::Network& network, std::unique_ptr<RobotModelBase> robot_model);
+  explicit Model(franka::Network& network, const std::string& urdf_model);
 
   /**
    * Move-constructs a new Model instance.

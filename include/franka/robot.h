@@ -738,6 +738,7 @@ class Robot {
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    */
   Model loadModel();
+  Model loadModel(const std::string& urdf_model);
 
   // Loads the model library for the unittests mockRobotModel
   Model loadModel(std::unique_ptr<RobotModelBase> robot_model);

@@ -309,6 +309,10 @@ Model Robot::loadModel() {
   return impl_->loadModel();
 }
 
+Model Robot::loadModel(const std::string& urdf_model) {
+  return impl_->loadModel(urdf_model);
+}
+
 Model Robot::loadModel(std::unique_ptr<RobotModelBase> robot_model) {
   return impl_->loadModel(std::move(robot_model));
 }

@@ -6,6 +6,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <optional>
 
 #include <franka/control_types.h>
 #include <franka/duration.h>

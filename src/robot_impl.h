@@ -394,7 +394,7 @@ inline void Robot::Impl::handleCommandResponse<research_interface::robot::Move>(
       }
       break;
     case research_interface::robot::Move::Status::kEmergencyAborted:
-      throw CommandException(
+      throw EmergencyException(
           "libfranka: "s +
           research_interface::robot::CommandTraits<research_interface::robot::Move>::kName +
           " command aborted: User Stop pressed!");
@@ -472,7 +472,7 @@ inline void Robot::Impl::handleCommandResponse<research_interface::robot::StopMo
           research_interface::robot::CommandTraits<research_interface::robot::StopMove>::kName +
           commandNotPossibleMsg());
     case research_interface::robot::StopMove::Status::kEmergencyAborted:
-      throw CommandException(
+      throw EmergencyException(
           "libfranka: "s +
           research_interface::robot::CommandTraits<research_interface::robot::StopMove>::kName +
           " command aborted: User Stop pressed!");
@@ -504,7 +504,7 @@ inline void Robot::Impl::handleCommandResponse<research_interface::robot::Automa
     case research_interface::robot::AutomaticErrorRecovery::Status::kSuccess:
       break;
     case research_interface::robot::AutomaticErrorRecovery::Status::kEmergencyAborted:
-      throw CommandException("libfranka: "s +
+      throw EmergencyException("libfranka: "s +
                              research_interface::robot::CommandTraits<
                                  research_interface::robot::AutomaticErrorRecovery>::kName +
                              " command aborted: User Stop pressed!");

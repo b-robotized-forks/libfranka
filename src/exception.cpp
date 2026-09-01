@@ -16,6 +16,10 @@ ControlException::ControlException(const std::string& what,
                                    std::vector<franka::Record> log) noexcept
     : Exception(what), log(std::move(log)) {}
 
+EmergencyControlException::EmergencyControlException(const std::string& what,
+                                                     std::vector<franka::Record> log) noexcept
+    : Exception(what), log(std::move(log)) {}
+
 IncompatibleVersionException::IncompatibleVersionException(uint16_t server_version,
                                                            uint16_t library_version) noexcept
     : Exception(

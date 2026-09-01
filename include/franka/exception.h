@@ -87,9 +87,38 @@ struct ControlException : public Exception {
 };
 
 /**
+ * EmergencyControlException is thrown if an error occurs during motion generation or torque control due to emergency stop or robot gets locked.
+ * The exception holds a vector with the last received robot states. The number of recorded
+ * states can be configured in the Robot constructor.
+ *
+ */
+struct EmergencyControlException : public Exception {
+  /**
+   * Creates the exception with an explanatory string and a Log object.
+   *
+   * @param[in] what Explanatory string.
+   * @param[in] log Vector of last received states and commands.
+   */
+  explicit EmergencyControlException(const std::string& what, std::vector<franka::Record> log = {}) noexcept;
+
+  /**
+   * Vector of states and commands logged just before the exception occurred.
+   */
+  const std::vector<franka::Record>
+      log;  // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
+};
+
+/**
  * CommandException is thrown if an error occurs during command execution.
  */
 struct CommandException : public Exception {
+  using Exception::Exception;
+};
+
+/**
+ * EmergencyException is thrown if an error occurs during command execution due to emergency stop or robot gets locked.
+ */
+struct EmergencyException : public Exception {
   using Exception::Exception;
 };
 

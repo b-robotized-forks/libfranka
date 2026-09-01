@@ -43,6 +43,36 @@ inline ControlException createControlException(const char* message,
   return ControlException(message_stream.str(), log);
 }
 
+inline EmergencyControlException createEmergencyControlException(const char* message,
+                                               research_interface::robot::Move::Status move_status,
+                                               const Errors& reflex_errors,
+                                               const std::vector<Record>& log) {
+  std::ostringstream message_stream;
+  message_stream << message;
+  if (move_status == decltype(move_status)::kReflexAborted) {
+    message_stream << " " << reflex_errors;
+
+    if (log.size() >= 2) {
+      // Count number of lost packets in the last and before last packets.
+      uint64_t lost_packets =
+          log[log.size() - 1].state.time.toMSec() - log[log.size() - 2].state.time.toMSec() - 1;
+      // Read second to last control_command_success_rate since the last one will always be zero and
+      // consider in the success rate assumming all previous packets were lost.
+      message_stream << std::endl
+                     << "control_command_success_rate: "
+                     << (log[log.size() - 2].state.control_command_success_rate *
+                         (1 - static_cast<double>(lost_packets) / 100));
+      // Packets lost in a row
+      if (lost_packets > 0) {
+        message_stream << " packets lost in a row in the last sample: " << lost_packets;
+      }
+    }
+  }
+
+  logging::logError(message_stream.str());
+  return EmergencyControlException(message_stream.str(), log);
+}
+
 }  // anonymous namespace
 
 Robot::Impl::Impl(std::unique_ptr<Network> network, size_t log_size, RealtimeConfig realtime_config)
@@ -105,6 +135,9 @@ void Robot::Impl::throwOnMotionError(const RobotState& robot_state, uint32_t mot
       handleCommandResponse<research_interface::robot::Move>(response);
     } catch (const CommandException& e) {
       throw createControlException(e.what(), response.status, robot_state.last_motion_errors,
+                                   logger_.flush());
+    } catch (const EmergencyException& e) {
+      throw createEmergencyControlException(e.what(), response.status, robot_state.last_motion_errors,
                                    logger_.flush());
     }
     throw ProtocolException("Unexpected reply to a Move command");
@@ -329,6 +362,9 @@ uint32_t Robot::Impl::startMotion(
       }
     } catch (const CommandException& e) {
       throw ControlException(e.what());
+    } catch (const EmergencyException& e) {
+      // Handle e-stop / emergency stop specifically
+      throw EmergencyControlException(e.what());
     }
 
     robot_state = updateMotion(std::nullopt, std::nullopt);
@@ -377,6 +413,9 @@ void Robot::Impl::finishMotion(
     handleCommandResponse<research_interface::robot::Move>(response);
   } catch (const CommandException& e) {
     throw createControlException(e.what(), response.status, robot_state.last_motion_errors,
+                                 logger_.flush());
+  } catch (const EmergencyException& e) {
+    throw createEmergencyControlException(e.what(), response.status, robot_state.last_motion_errors,
                                  logger_.flush());
   }
   current_move_motion_generator_mode_ = research_interface::robot::MotionGeneratorMode::kIdle;
